@@ -25,7 +25,7 @@
 
 ## Lancer le projet en debug
 * Se connecter au raspberry `ssh pi@monipderaspberry`
-* Aller dans le dossier ou est enregistré le projet : `cd ~/allo`
+* Aller dans le dossier ou est enregistré le projet : `cd ~/snips`
 * Lancer le projet `python main.py`
 * Depuis son ordinateur, pour avoir les logs de la circulation mqtt : `sam watch`
 
