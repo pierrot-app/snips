@@ -1,0 +1,33 @@
+{
+	"categories": [
+		"Pates",
+		"Courgette"
+	],
+	"name": "une recette de pâtes aux courgettes",
+	"person": 2,
+	"difficulty": "facile",
+	"preparationTime": "10 minutes",
+	"cookingTime": "20 minutes",
+	"totalTime": "30 minutes",
+	"ingredients": [
+		"1 belle courgette",
+		"épices : ail en poudre, paprika et poivre",
+		"une cuillère à soupe d’huile d’olive",
+		"des pates. Personnellement, je recommande les linguine",
+		"une cuilllère à soupe de crème fraîche",
+		"du parmesan"
+	],
+	"steps": {
+		"1": "Mettre une casserole d’eau à bouillir.",
+		"2": "Laver, éplucher et couper en rondelles la courgette.",
+		"3": "La disposer dans un plat allant au four, ajouter l’huile d’olive, les épices selon votre goût.",
+		"4": {
+			"text": "Bien mélanger et enfourner une dizaine de minutes à 180 degrés",
+			"timer": 600,
+			"textAfterTimer": "Il est temps de sortir les courgettes du four!"
+		},
+		"5": "Pendant ce temps, faire cuire les pâtes. Se référer au temps indiqué sur le paquet.",
+		"6": "Une fois cuite, mélanger les courgettes avec la crème fraîche.",
+		"7": "Dresser les pâtes, verser les courgettes et la crème fraîche par dessus servir sans plus attendre avec un peu de parmesan."
+	}
+}

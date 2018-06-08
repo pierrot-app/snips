@@ -13,8 +13,8 @@
 
 ## Installation de l'assistant ALLO sur le raspberry
 * Se connecter au raspberry `ssh pi@monipderaspberry`
-* Installer les dépendances python : `sudo pip3 install -r requirements.txt`
 * Cloner le projet `git clone https://github.com/pierrot-app/snips.git`
+* Installer les dépendances python : `sudo pip3 install -r requirements.txt`
 
 ## Installation de l'environnement snips sur son ordinateur
 * Avoir [node.js](https://nodejs.org/en/download/)
@@ -28,6 +28,10 @@
 * Aller dans le dossier ou est enregistré le projet : `cd ~/snips`
 * Lancer le projet `python main.py`
 * Depuis son ordinateur, pour avoir les logs de la circulation mqtt : `sam watch`
+
+## Récupérer les mise à jour
+* Bien se placer à la racine du repo et `git pull origin master`
+* et si besoin de mettre à jour l'assistant, entrer la commande depuis son ordinateur : `sam install assistant`
 
 ## Outils
 * [MQTT.fx](http://mqttfx.org/) qui permet de monitorer depuis une GUI les channels mqtt.

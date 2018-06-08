@@ -22,5 +22,8 @@
 	"timerAlreadyRunning": "Un minuteur est déjà démarré pour cette étape",
 	"timerConfirm": "Ok! Minuteur pour cette étape démarré!",
 	"error": "Désolé, mais il y a eu une erreur",
-	"timerEnd": "Un minuteur est arrivé à terme: {}"
+	"timerEnd": "Un minuteur est arrivé à terme: {}",
+	"cookNowOrKeep": "Bien sur ! tu veux manger tout de suite ou faire une conserve de {}?",
+	"startRecipe": "Merci ! Laisse moi quelques secondes pour trouver une recette avec {}",
+	"recipeproposition" : "J’ai une recette qui va te plaire ! C'est {}"
 }

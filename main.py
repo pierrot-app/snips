@@ -25,12 +25,25 @@ logging.basicConfig(
 	filemode='w'
 )
 
+# read recipe
+
 OPEN_RECIPE 				= 'hermes/intent/Psychokiller1888:openRecipe'
 NEXT_STEP 					= 'hermes/intent/Psychokiller1888:nextStep'
 INGREDIENTS 				= 'hermes/intent/Psychokiller1888:ingredients'
 PREVIOUS_STEP 				= 'hermes/intent/Psychokiller1888:previousStep'
 REPEAT_STEP 				= 'hermes/intent/Psychokiller1888:repeatStep'
 ACTIVATE_TIMER 				= 'hermes/intent/Psychokiller1888:activateTimer'
+
+# Conservation
+
+GET_FOOD	 				= 'hermes/intent/Pierrot-app:getFoodRequest'
+PRODUCT_AGE	 				= 'hermes/intent/Pierrot-app:getProductAge'
+EATING_DATE 				= 'hermes/intent/Pierrot-app:getFoodRequest'
+GET_FOOD_COOK_NOW 			= 'hermes/intent/Pierrot-app:getFoodAndCookNow'
+GET_FOOD_KEEP 				= 'hermes/intent/Pierrot-app:getFoodAndKeep'
+COOK_NOW_OR_KEEP			= 'hermes/intent/Pierrot-app:cookNowOrKeep'
+
+# asr and tts
 
 HERMES_ON_HOTWORD 			= 'hermes/hotword/default/detected'
 HERMES_START_LISTENING 		= 'hermes/asr/startListening'
@@ -45,6 +58,13 @@ def onConnect(client, userData, flags, rc):
 	mqttClient.subscribe(PREVIOUS_STEP)
 	mqttClient.subscribe(REPEAT_STEP)
 	mqttClient.subscribe(ACTIVATE_TIMER)
+
+	mqttClient.subscribe(GET_FOOD)
+	mqttClient.subscribe(PRODUCT_AGE)
+	mqttClient.subscribe(EATING_DATE)
+	mqttClient.subscribe(GET_FOOD_COOK_NOW)
+	mqttClient.subscribe(GET_FOOD_KEEP)
+	mqttClient.subscribe(COOK_NOW_OR_KEEP)
 
 	mqttClient.subscribe(HERMES_ON_HOTWORD)
 	mqttClient.subscribe(HERMES_START_LISTENING)
@@ -109,29 +129,7 @@ def onMessage(client, userData, message):
 				currentStep = 0
 
 		if os.path.isfile('./recipes/{}/{}.json'.format(settings.LANG, slotRecipeName.lower())):
-			endTalk(sessionId, text=lang['confirmOpening'].format(payload['slots'][0]['rawValue']))
-			currentStep = 0
-
-			file = codecs.open('./recipes/{}/{}.json'.format(settings.LANG, slotRecipeName.lower()), 'r', encoding='utf-8')
-			string = file.read()
-			file.close()
-			recipe = json.loads(string)
-
-			time.sleep(2)
-
-			recipeName = recipe['name'] if 'phonetic' not in recipe else recipe['phonetic']
-			timeType = lang['cookingTime'] if 'cookingTime' in recipe else lang['waitTime']
-			cookOrWaitTime = recipe['cookingTime'] if 'cookingTime' in recipe else recipe['waitTime']
-
-			say(text=lang['recipePresentation'].format(
-				recipeName,
-				recipe['difficulty'],
-				recipe['person'],
-				recipe['totalTime'],
-				recipe['preparationTime'],
-				cookOrWaitTime,
-				timeType
-			))
+			readReacipe(sessionId, slotRecipeName, payload)
 		else:
 			endTalk(sessionId, text=lang['recipeNotFound'])
 
@@ -152,7 +150,7 @@ def onMessage(client, userData, message):
 
 				endTalk(sessionId, text=lang['nextStep'].format(step))
 				if ask:
-					say(text=lang['timeAsk'])
+					say(text=lang['timerAsk'])
 
 	elif intent == INGREDIENTS:
 		if recipe is None:
@@ -211,9 +209,28 @@ def onMessage(client, userData, message):
 				timers[currentStep] = timer
 				endTalk(sessionId, text=lang['timerConfirm'])
 
+	elif intent == GET_FOOD:
+		food = payload["slots"][0]["rawValue"]
+		continueSession(sessionId=sessionId, text=lang['cookNowOrKeep'].format(food), intents=['cookNowOrKeep'])
+
+	elif intent == GET_FOOD_COOK_NOW or intent == COOK_NOW_OR_KEEP:
+		food = payload["slots"][0]["rawValue"]
+		slotRecipeName = payload['slots'][0]['value']['value'].encode('utf-8')
+		# endTalk(sessionId=sessionId, text=lang['startRecipe'].format(food), intents=['openRecipe'])
+		readRecipe(sessionId, slotRecipeName, payload)
+
+
+
 
 def error(sessionId):
 	endTalk(sessionId, lang['error'])
+
+def continueSession(sessionId, text, intents):
+	mqttClient.publish('hermes/dialogueManager/continueSession', json.dumps({
+		'sessionId': sessionId,
+		'text': text,
+		'intentFilter': intents
+	}))
 
 def endTalk(sessionId, text):
 	mqttClient.publish('hermes/dialogueManager/endSession', json.dumps({
@@ -235,6 +252,22 @@ def onTimeUp(*args, **kwargs):
 	step = args[1]
 	del timers[wasStep]
 	say(text=lang['timerEnd'].format(step['textAfterTimer']))
+
+def readRecipe(sessionId, slotRecipeName, payload):
+	endTalk(sessionId, text=lang['confirmOpening'].format(payload['slots'][0]['rawValue']))
+	currentStep = 0
+	file = codecs.open('./recipes/{}/{}.json'.format(settings.LANG, slotRecipeName.lower()), 'r', encoding='utf-8')
+	string = file.read()
+	file.close()
+	recipe = json.loads(string)
+
+	time.sleep(2)
+
+	recipeName = recipe['name'] if 'phonetic' not in recipe else recipe['phonetic']
+	timeType = lang['cookingTime'] if 'cookingTime' in recipe else lang['waitTime']
+	cookOrWaitTime = recipe['cookingTime'] if 'cookingTime' in recipe else recipe['waitTime']
+
+	continueSession(sessionId, text=lang['recipeProposition'].format(recipeName), ['validateRecipe'])
 
 
 mqttClient = None

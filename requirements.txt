@@ -1,2 +1,2 @@
-spidev==3.3
+spidev==3.2
 paho-mqtt==1.3.1
