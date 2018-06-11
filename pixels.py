@@ -8,12 +8,13 @@ try:
 except ImportError:
     import Queue as Queue
 
+from alexa_led_pattern import AlexaLedPattern
 from google_home_led_pattern import GoogleHomeLedPattern
 
 class Pixels:
     PIXELS_N = 12
 
-    def __init__(self, pattern=GoogleHomeLedPattern):
+    def __init__(self, pattern=AlexaLedPattern):
         self.pattern = pattern(show=self.show)
 
         self.dev = apa102.APA102(num_led=self.PIXELS_N)
