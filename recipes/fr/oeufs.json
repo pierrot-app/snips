@@ -1,0 +1,27 @@
+{
+	"categories": [
+		"pancake"
+	],
+	"name": "une recette de pancake",
+	"phonetic": "une recette de panquaik",
+	"person": 3,
+	"difficulty": "facile",
+	"preparationTime": "5 minutes",
+	"cookingTime": "15 minutes",
+	"totalTime": "20 minutes",
+	"ingredients": [
+		"2 oeufs",
+		"2 yaourt nature",
+		"1 pot de yaourt de farine de blé",
+		"1 sachet de levure",
+		"1 sachet de sucre vanillé (optionnel)",
+		"Arôme : Miel, vanille, rhum selon vos goût",
+		"de l'huile pour la poêle"
+	],
+	"steps": {
+		"1": "Dans un bol, versez les yaourt",
+		"2": "Ajouter les oeufs.",
+		"3": "Incorporez ensuite la farine, la levure, le sachet de sucre vanillé et mélangez le tout.",
+		"4": "Faire cuire dans une poêle à crêpes bien chaude et huilée. Quand vous voyez de petites bulles apparaître sur la surface de vos pancakes, c’est qu’il est temps de les retourner !"
+	}
+}
