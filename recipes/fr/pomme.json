@@ -1,0 +1,37 @@
+{
+	"categories": [
+		"crumble",
+		"pomme"
+	],
+	"name": "une recette de crumble aux pommes",
+	"person": 5,
+	"difficulty": "facile",
+	"preparationTime": "15 minutes",
+	"cookingTime": "30 minutes",
+	"totalTime": "45 minutes",
+	"ingredients": [
+		"3 pommes Golden",
+		"75 grammes de farine de blé",
+		"65 grammes de sucre en poudre",
+		"1 citron jaune",
+		"65 grammes de beurre doux (mou)",
+		"une demaie cuillère à café de cannelle en poudre",
+		"1 noisette de beurre pour le plat"
+	],
+	"steps": {
+		"1": "Préchauffez le four à 180 degrés",
+		"2": "Coupez en deux le citron jaune non traité et pressez-le afin d’en récupérer le jus. Retirez-y les pépins si besoin.",
+		"3": "Épluchez et coupez les pommes en deux. Retirez les tiges, les coeurs et les pépins, puis découpez-les en quartiers",
+		"4": "Beurrez un plat à gratin. Répartissez-y les quartiers de pommes, puis versez le jus de citron par-dessus pour éviter que les fruits ne noircissent. Réservez.",
+		"5": "Préparez la pâte à crumble en coupant le beurre en petits dés dans un saladier. Si votre beurre est trop dur, passez-le 5 à 10 secondes au micro-ondes.",
+		"6": "Versez la farine de blé dans le saladier, la cannelle et le sucre.",
+		"7": "Malaxez le tout avec vos doigts pendant plusieurs minutes jusqu’à obtenir une pâte sableuse qui s’effrite.",
+		"8": "Dans le plat, saupoudrez la pâte sableuse sur les quartiers de pommes.",
+		"9": {
+			"text": "Enfournez le crumble aux pommes dans le four préchauffé et laissez cuire pendant 30 minutes environ ou jusqu’à ce que la surface soit bien dorée.",
+			"timer": 1800,
+			"textAfterTimer": "Il est temps de sortir le crumble du four!"
+		},
+		"10": "À la sortie du four, laissez tiédir ce dessert aux pommes pendant quelques instants sur une grille"
+	}
+}
