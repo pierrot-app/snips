@@ -1,3 +1,6 @@
 test/
 sftp-config.json
 .idea/
+*.pyc
+logs.log
+__pycache__/
