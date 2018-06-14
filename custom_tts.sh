@@ -26,8 +26,17 @@ cache="/tmp/cache/"
 # Path to aws binary
 awscli='/home/pi/.local/bin/aws'
 
+# Get hotword
+hotword=$(head -n 1 '/home/pi/snips/hotword.txt')
+
 # Voice to use
-voice="Mathieu"
+
+if [ "$hotword" == "paprika" ]; then
+    voice="Celine"
+fi
+if [ "$hotword" == "marin" ]; then
+    voice="Mathieu"
+fi
 
 # Should not need to change parameters below this
 # format to use

@@ -15,6 +15,7 @@ if settings.USE_LEDS:
 import sys
 from threading import Timer
 import time
+import utils
 
 import logging
 
@@ -25,7 +26,7 @@ logging.basicConfig(
 	filemode='w'
 )
 
-# read recipe
+# psycho intents
 
 OPEN_RECIPE 				= 'hermes/intent/Psychokiller1888:openRecipe'
 NEXT_STEP 					= 'hermes/intent/Psychokiller1888:nextStep'
@@ -34,7 +35,7 @@ PREVIOUS_STEP 				= 'hermes/intent/Psychokiller1888:previousStep'
 REPEAT_STEP 				= 'hermes/intent/Psychokiller1888:repeatStep'
 ACTIVATE_TIMER 				= 'hermes/intent/Psychokiller1888:activateTimer'
 
-# Conservation
+# Allo intents
 
 GET_FOOD	 				= 'hermes/intent/Pierrot-app:getFoodRequest'
 PRODUCT_AGE	 				= 'hermes/intent/Pierrot-app:getProductAge'
@@ -81,8 +82,15 @@ def onMessage(client, userData, message):
 	global lang
 
 	intent = message.topic
+	payload = json.loads(message.payload)
+
 
 	if intent == HERMES_ON_HOTWORD:
+		last_hotword = utils.read_file("hotword.txt")
+		current_hotword = payload['modelId'].encode('utf-8')
+		if last_hotword != current_hotword:
+			utils.write_to_file("hotword.txt", current_hotword)
+
 		if settings.USE_LEDS:
 			leds.wakeup()
 		return
@@ -109,7 +117,6 @@ def onMessage(client, userData, message):
 
 	global recipe, currentStep, timers, confirm, sessionId, product
 
-	payload = json.loads(message.payload)
 	sessionId = payload['sessionId']
 
 	if intent == OPEN_RECIPE:
