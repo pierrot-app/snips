@@ -44,7 +44,7 @@ Pour monitorer un channel mqtt il faut souscrire à celui-ci puis publier dessus
 Channel : `hermes/#`
 
 ### Commandes pour publier sur un channel mqtt
-Demander la lecture d’un message text au TTS :
+- Demander la lecture d’un message text au TTS :
 ```shell
 Channel : hermes/dialogueManager/startSession
 payload :
@@ -55,7 +55,8 @@ payload :
 		}
 }
 ```
-Déclencher intent getFoodRequest :
+
+- Déclencher intent getFoodRequest :
 ```shell
 Channel : hermes/intent/Pierrot-app:getFoodRequest
 payload :
