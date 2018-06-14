@@ -46,18 +46,20 @@ Channel : `hermes/#`
 ### Commandes pour publier sur un channel mqtt
 Demander la lecture d’un message text au TTS :
 ```shell
-Channel : `hermes/dialogueManager/startSession`
-payload :{
+Channel : hermes/dialogueManager/startSession
+payload :
+{
 	"init":{
 		"type":"notification",
 		"text":"Hello world"
 		}
-	}
+}
 ```
 Déclencher intent getFoodRequest :
 ```shell
-Channel : `hermes/intent/Pierrot-app:getFoodRequest`
-payload :{
+Channel : hermes/intent/Pierrot-app:getFoodRequest
+payload :
+{
   "sessionId" : "9b6bf460-91c5-4d5d-a37b-188454f4a0a8",
   "customData" : null,
   "siteId" : "default",
