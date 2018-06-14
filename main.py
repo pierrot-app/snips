@@ -220,7 +220,6 @@ def onMessage(client, userData, message):
 
 	elif intent == GET_FOOD:
 		product = payload["slots"][0]["rawValue"]
-		print("payload : ",payload)
 		continueSession(sessionId=sessionId, text=lang['cookNowOrKeep'].format(product), intents=['Pierrot-app:nowOrLater'])
 
 	elif intent == GET_FOOD_COOK_NOW:
