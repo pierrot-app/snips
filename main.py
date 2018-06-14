@@ -54,6 +54,15 @@ HERMES_SAY 					= 'hermes/tts/say'
 HERMES_CAPTURED 			= 'hermes/asr/textCaptured'
 HERMES_HOTWORD_TOGGLE_ON 	= 'hermes/hotword/toggleOn'
 
+recipe_ingredients = [
+	'pommes',
+	'pomme',
+	'courgette',
+	'courgettes',
+	'oeufs',
+	'oeuf'	
+]
+
 def onConnect(client, userData, flags, rc):
 	mqttClient.subscribe(OPEN_RECIPE)
 	mqttClient.subscribe(NEXT_STEP)
@@ -140,7 +149,8 @@ def onMessage(client, userData, message):
 				currentStep = 0
 
 		# TODO changer cette condition par la prise en compte de l'ingredient dans le nom de la recette.
-		if os.path.isfile('./recipes/{}/{}.json'.format(settings.LANG, slotRecipeName.lower())):
+		if any(slotRecipeName.lower() in ingredients for ingredients in recipe_ingredients):
+		# if os.path.isfile('./recipes/{}/{}.json'.format(settings.LANG, slotRecipeName.lower())):
 			readRecipe(sessionId, slotRecipeName, payload)
 		else:
 			endTalk(sessionId, text=lang['recipeNotFound'])
@@ -227,12 +237,18 @@ def onMessage(client, userData, message):
 
 	elif intent == GET_FOOD:
 		product = payload["slots"][0]["rawValue"]
-		continueSession(sessionId=sessionId, text=lang['cookNowOrKeep'].format(product), intents=['Pierrot-app:nowOrLater'])
+		if any(product.lower() in ingredients for ingredients in recipe_ingredients):
+			continueSession(sessionId=sessionId, text=lang['cookNowOrKeep'].format(product), intents=['Pierrot-app:nowOrLater'])
+		else:
+			endTalk(sessionId, text=lang['recipeNotFound'])
 
 	elif intent == GET_FOOD_COOK_NOW:
-		slotRecipeName = payload['slots'][0]['value']['value'].encode('utf-8')
-		# endTalk(sessionId=sessionId, text=lang['startRecipe'].format(food), intents=['openRecipe'])
-		readRecipe(sessionId, slotRecipeName, payload)
+		product = payload['slots'][0]['value']['value'].encode('utf-8')
+		if any(product.lower() in ingredients for ingredients in recipe_ingredients):
+			# endTalk(sessionId=sessionId, text=lang['startRecipe'].format(food), intents=['openRecipe'])
+			readRecipe(sessionId, product, payload)
+		else:
+			endTalk(sessionId, text=lang['recipeNotFound'])
 
 	elif intent == COOK_NOW_OR_KEEP:
 		readRecipe(sessionId, product, payload)
