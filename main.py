@@ -60,7 +60,7 @@ recipe_ingredients = [
 	'courgette',
 	'courgettes',
 	'oeufs',
-	'oeuf'	
+	'oeuf'
 ]
 
 def onConnect(client, userData, flags, rc):
