@@ -21,7 +21,7 @@ export AWS_SECRET_ACCESS_KEY=""
 export AWS_DEFAULT_REGION="eu-west-3"
 
 # Folder to cache the files - this also contains the .txt file with all generated mp3
-cache="/tmp/cache/"
+cache="/home/pi/snips-tts-cache/"
 
 # Path to aws binary
 awscli='/home/pi/.local/bin/aws'

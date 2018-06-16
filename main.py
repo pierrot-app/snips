@@ -15,6 +15,10 @@ if settings.USE_LEDS:
 import sys
 from threading import Timer
 import time
+if settings.USE_LEDS:
+	from pixels import Pixels, pixels
+	from alexa_led_pattern import AlexaLedPattern
+	from google_home_led_pattern import GoogleHomeLedPattern
 import utils
 
 import logging
@@ -29,7 +33,6 @@ logging.basicConfig(
 # psycho intents
 
 OPEN_RECIPE 				= 'hermes/intent/Psychokiller1888:openRecipe'
-NEXT_STEP 					= 'hermes/intent/Psychokiller1888:nextStep'
 INGREDIENTS 				= 'hermes/intent/Psychokiller1888:ingredients'
 PREVIOUS_STEP 				= 'hermes/intent/Psychokiller1888:previousStep'
 REPEAT_STEP 				= 'hermes/intent/Psychokiller1888:repeatStep'
@@ -37,14 +40,16 @@ ACTIVATE_TIMER 				= 'hermes/intent/Psychokiller1888:activateTimer'
 
 # Allo intents
 
+NEXT_STEP 					= 'hermes/intent/Psychokiller1888:nextStep'
 GET_FOOD	 				= 'hermes/intent/Pierrot-app:getFoodRequest'
 PRODUCT_AGE	 				= 'hermes/intent/Pierrot-app:getProductAge'
 EATING_DATE 				= 'hermes/intent/Pierrot-app:getFoodRequest'
-GET_FOOD_COOK_NOW 			= 'hermes/intent/Pierrot-app:getFoodAndCookNow'
+# GET_FOOD_COOK_NOW 			= 'hermes/intent/Pierrot-app:getFoodAndCookNow'
 GET_FOOD_KEEP 				= 'hermes/intent/Pierrot-app:getFoodAndKeep'
 COOK_NOW_OR_KEEP			= 'hermes/intent/Pierrot-app:nowOrLater'
 VALIDATE_QUESTION			= 'hermes/intent/Pierrot-app:validateQuestion'
 START_RECIPE				= 'hermes/intent/Pierrot-app:startRecipe'
+CANCEL						= 'hermes/intent/Pierrot-app:cancelSession'
 
 # asr and tts
 
@@ -74,11 +79,12 @@ def onConnect(client, userData, flags, rc):
 	mqttClient.subscribe(GET_FOOD)
 	mqttClient.subscribe(PRODUCT_AGE)
 	mqttClient.subscribe(EATING_DATE)
-	mqttClient.subscribe(GET_FOOD_COOK_NOW)
+	# mqttClient.subscribe(GET_FOOD_COOK_NOW)
 	mqttClient.subscribe(GET_FOOD_KEEP)
 	mqttClient.subscribe(COOK_NOW_OR_KEEP)
 	mqttClient.subscribe(VALIDATE_QUESTION)
 	mqttClient.subscribe(START_RECIPE)
+	mqttClient.subscribe(CANCEL)
 
 	mqttClient.subscribe(HERMES_ON_HOTWORD)
 	mqttClient.subscribe(HERMES_START_LISTENING)
@@ -156,6 +162,7 @@ def onMessage(client, userData, message):
 			endTalk(sessionId, text=lang['recipeNotFound'])
 
 	elif intent == NEXT_STEP:
+		# print("recipe : ",recipe)
 		if recipe is None:
 			endTalk(sessionId, text=lang['sorryNoRecipeOpen'])
 		else:
@@ -242,13 +249,13 @@ def onMessage(client, userData, message):
 		else:
 			endTalk(sessionId, text=lang['recipeNotFound'])
 
-	elif intent == GET_FOOD_COOK_NOW:
-		product = payload['slots'][0]['value']['value'].encode('utf-8')
-		if any(product.lower() in ingredients for ingredients in recipe_ingredients):
-			# endTalk(sessionId=sessionId, text=lang['startRecipe'].format(food), intents=['openRecipe'])
-			readRecipe(sessionId, product, payload)
-		else:
-			endTalk(sessionId, text=lang['recipeNotFound'])
+	# elif intent == GET_FOOD_COOK_NOW:
+	# 	product = payload['slots'][0]['value']['value'].encode('utf-8')
+	# 	if any(product.lower() in ingredients for ingredients in recipe_ingredients):
+	# 		# endTalk(sessionId=sessionId, text=lang['startRecipe'].format(food), intents=['openRecipe'])
+	# 		readRecipe(sessionId, product, payload)
+	# 	else:
+	# 		endTalk(sessionId, text=lang['recipeNotFound'])
 
 	elif intent == COOK_NOW_OR_KEEP:
 		readRecipe(sessionId, product, payload)
@@ -258,7 +265,15 @@ def onMessage(client, userData, message):
 			endTalk(sessionId, text=lang['sorryNoRecipeOpen'])
 		else:
 			if currentStep != 0:
-				nextStep(sessionId)
+				currentStep += 1
+				step = recipe['steps'][str(currentStep)]
+
+				ask = False
+				if type(step) is dict and currentStep not in timers:
+					ask = True
+					step = step['text']
+
+				endTalk(sessionId, text=lang['nextStep'].format(step))
 			else:
 				ingredients = ''
 				for ingredient in recipe['ingredients']:
@@ -270,7 +285,26 @@ def onMessage(client, userData, message):
 		if recipe is None:
 			endTalk(sessionId, text=lang['sorryNoRecipeOpen'])
 		else:
-			nextStep(sessionId)
+			currentStep += 1
+			step = recipe['steps'][str(currentStep)]
+
+			ask = False
+			if type(step) is dict and currentStep not in timers:
+				ask = True
+				step = step['text']
+
+			endTalk(sessionId, text=lang['nextStep'].format(step))
+			if ask:
+				say(text=lang['timerAsk'])
+
+
+	elif intent == CANCEL:
+		if settings.USE_LEDS:
+			pixels.off()
+		error(sessionId)
+		mqttClient.loop_stop()
+		mqttClient.disconnect()
+		running = False
 
 
 
@@ -300,13 +334,13 @@ def say(text):
 	}))
 
 def nextStep(sessionId):
-	mqttClient.publish('hermes/intent/Psychokiller1888:nextStep', json.dumps({
+	mqttClient.publish(NEXT_STEP, json.dumps({
 		"sessionId" : sessionId,
 		"customData" : "null",
 		"siteId" : "default",
 		"input" : "étape suivante",
 		"intent" : {
-			"intentName" : "Psychokiller1888:nextStep",
+			"intentName" : "Pierrot-app:nextStep",
 			"probability" : 1
 			},
 		"slots" : [ ]
@@ -320,7 +354,6 @@ def onTimeUp(*args, **kwargs):
 	say(text=lang['timerEnd'].format(step['textAfterTimer']))
 
 def readRecipe(sessionId, slotRecipeName, payload):
-	# endTalk(sessionId, text=lang['confirmOpening'].format(payload['slots'][0]['rawValue']))
 	global recipe
 	currentStep = 0
 	file = codecs.open('./recipes/{}/{}.json'.format(settings.LANG, slotRecipeName.lower()), 'r', encoding='utf-8')
@@ -341,6 +374,7 @@ mqttClient = None
 leds = None
 running = True
 recipe = None
+sessionId = None
 currentStep = 0
 timers = {}
 confirm = 0
@@ -375,7 +409,8 @@ if __name__ == '__main__':
 		while running:
 			time.sleep(0.1)
 	except KeyboardInterrupt:
-		error(sessionId)
+		if sessionId is not None:
+			error(sessionId)
 		mqttClient.loop_stop()
 		mqttClient.disconnect()
 		running = False
