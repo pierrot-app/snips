@@ -10,8 +10,6 @@ import json
 import os
 import paho.mqtt.client as mqtt
 import paho.mqtt.publish as mqttPublish
-if settings.USE_LEDS:
-	import pixels
 import sys
 from threading import Timer
 import time
@@ -107,27 +105,27 @@ def onMessage(client, userData, message):
 			utils.write_to_file("hotword.txt", current_hotword)
 
 		if settings.USE_LEDS:
-			leds.wakeup()
+			pixels.wakeup()
 		return
 
 	elif intent == HERMES_SAY:
 		if settings.USE_LEDS:
-			leds.speak()
+			pixels.speak()
 		return
 
 	elif intent == HERMES_CAPTURED:
 		if settings.USE_LEDS:
-			leds.think()
+			pixels.think()
 		return
 
 	elif intent == HERMES_START_LISTENING:
 		if settings.USE_LEDS:
-			leds.listen()
+			pixels.listen()
 		return
 
 	elif intent == HERMES_HOTWORD_TOGGLE_ON:
 		if settings.USE_LEDS:
-			leds.off()
+			pixels.off()
 		return
 
 	global recipe, currentStep, timers, confirm, sessionId, product
@@ -387,8 +385,8 @@ if __name__ == '__main__':
 	logger.info('...My Chef...')
 
 	if settings.USE_LEDS:
-		leds = pixels.Pixels()
-		leds.off()
+		pixels.pattern = GoogleHomeLedPattern(show=pixels.show)
+		pixels.off()
 
 	try:
 		file = codecs.open('./languages/{}.json'.format(settings.LANG), 'r', encoding='utf-8')
