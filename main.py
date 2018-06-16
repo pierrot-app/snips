@@ -15,10 +15,6 @@ if settings.USE_LEDS:
 import sys
 from threading import Timer
 import time
-if settings.USE_LEDS:
-	from pixels import Pixels, pixels
-	from alexa_led_pattern import AlexaLedPattern
-	from google_home_led_pattern import GoogleHomeLedPattern
 import utils
 
 import logging
