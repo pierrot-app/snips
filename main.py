@@ -38,7 +38,7 @@ ACTIVATE_TIMER 				= 'hermes/intent/Psychokiller1888:activateTimer'
 
 # Allo intents
 
-NEXT_STEP 					= 'hermes/intent/Psychokiller1888:nextStep'
+NEXT_STEP 					= 'hermes/intent/Pierrot-app:nextStep'
 GET_FOOD	 				= 'hermes/intent/Pierrot-app:getFoodRequest'
 PRODUCT_AGE	 				= 'hermes/intent/Pierrot-app:getProductAge'
 EATING_DATE 				= 'hermes/intent/Pierrot-app:getFoodRequest'
@@ -133,6 +133,7 @@ def onMessage(client, userData, message):
 	sessionId = payload['sessionId']
 
 	if intent == OPEN_RECIPE:
+		print("INTENT : OPEN_RECIPE")
 		if 'slots' not in payload:
 			error(sessionId)
 			return
@@ -160,10 +161,12 @@ def onMessage(client, userData, message):
 			endTalk(sessionId, text=lang['recipeNotFound'])
 
 	elif intent == NEXT_STEP:
-		# print("recipe : ",recipe)
+		print("INTENT : NEXT_STEP")
 		if recipe is None:
+			print("recipe is None NEXT_STEP")
 			endTalk(sessionId, text=lang['sorryNoRecipeOpen'])
 		else:
+			print("recipe is NOT None NEXT_STEP")
 			if str(currentStep + 1) not in recipe['steps']:
 				endTalk(sessionId, text=lang['recipeEnd'])
 			else:
@@ -180,6 +183,7 @@ def onMessage(client, userData, message):
 					say(text=lang['timerAsk'])
 
 	elif intent == INGREDIENTS:
+		print("INTENT : INGREDIENTS")
 		if recipe is None:
 			endTalk(sessionId, text=lang['sorryNoRecipeOpen'])
 		else:
@@ -190,6 +194,7 @@ def onMessage(client, userData, message):
 			endTalk(sessionId, text=lang['neededIngredients'].format(ingredients))
 
 	elif intent == PREVIOUS_STEP:
+		print("INTENT : PREVIOUS_STEP")
 		if recipe is None:
 			endTalk(sessionId, text=lang['sorryNoRecipeOpen'])
 		else:
@@ -211,6 +216,7 @@ def onMessage(client, userData, message):
 					say(text=lang['hadTimerAsk'].format(timer))
 
 	elif intent == REPEAT_STEP:
+		print("INTENT : REPEAT_STEP")
 		if recipe is None:
 			endTalk(sessionId, text=lang['sorryNoRecipeOpen'])
 		else:
@@ -225,6 +231,7 @@ def onMessage(client, userData, message):
 				endTalk(sessionId, text=lang['repeatStep'].format(step))
 
 	elif intent == ACTIVATE_TIMER:
+		print("INTENT : ACTIVATE_TIMER")
 		if recipe is None:
 			endTalk(sessionId, text=lang['noTimerNotStarted'])
 		else:
@@ -241,6 +248,7 @@ def onMessage(client, userData, message):
 				endTalk(sessionId, text=lang['timerConfirm'])
 
 	elif intent == GET_FOOD:
+		print("INTENT : GET_FOOD")
 		product = payload["slots"][0]["rawValue"]
 		if any(product.lower() in ingredients for ingredients in recipe_ingredients):
 			continueSession(sessionId=sessionId, text=lang['cookNowOrKeep'].format(product), intents=['Pierrot-app:nowOrLater'])
@@ -256,9 +264,11 @@ def onMessage(client, userData, message):
 	# 		endTalk(sessionId, text=lang['recipeNotFound'])
 
 	elif intent == COOK_NOW_OR_KEEP:
+		print("INTENT : COOK_NOW_OR_KEEP")
 		readRecipe(sessionId, product, payload)
 
 	elif intent == VALIDATE_QUESTION:
+		print("INTENT : VALIDATE_QUESTION")
 		if recipe is None:
 			endTalk(sessionId, text=lang['sorryNoRecipeOpen'])
 		else:
@@ -280,6 +290,7 @@ def onMessage(client, userData, message):
 				endTalk(sessionId, text=lang['neededIngredients'].format(ingredients))
 
 	elif intent == START_RECIPE:
+		print("INTENT : START_RECIPE")
 		if recipe is None:
 			endTalk(sessionId, text=lang['sorryNoRecipeOpen'])
 		else:
