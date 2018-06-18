@@ -20,9 +20,6 @@ export AWS_ACCESS_KEY_ID=""
 export AWS_SECRET_ACCESS_KEY=""
 export AWS_DEFAULT_REGION="eu-west-3"
 
-# Folder to cache the files - this also contains the .txt file with all generated mp3
-cache="/home/pi/snips-tts-cache/"
-
 # Path to aws binary
 awscli='/home/pi/.local/bin/aws'
 
@@ -33,10 +30,16 @@ hotword=$(head -n 1 '/home/pi/snips/hotword.txt')
 
 if [ "$hotword" == "paprika" ]; then
     voice="Celine"
+    # Folder to cache the files - this also contains the .txt file with all generated mp3
+    cache='/home/pi/snips-tts-cache-paprika/'
 fi
 if [ "$hotword" == "marin" ]; then
     voice="Mathieu"
+    # Folder to cache the files - this also contains the .txt file with all generated mp3
+    cache='/home/pi/snips-tts-cache-marin/'
 fi
+echo 'Voice: ' $voice
+echo 'cache folder: ' $cache
 
 # Should not need to change parameters below this
 # format to use
@@ -47,14 +50,6 @@ samplerate="22050"
 
 lang="$4"
 echo 'Lang: ' $lang
-
-if [ "$lang" == "es-ES" ]; then
-    voice="Enrique"
-fi
-if [ "$lang" == "es-US" ]; then
-    voice="Miguel"
-fi
-echo 'Voice: ' $voice
 
 # passed text string
 text="<speak><lang xml:lang=\"$lang\">$5</lang></speak>"
