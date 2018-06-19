@@ -30,7 +30,7 @@ logging.basicConfig(
 
 # psycho intents
 
-OPEN_RECIPE 				= 'hermes/intent/Psychokiller1888:openRecipe'
+# OPEN_RECIPE 				= 'hermes/intent/Psychokiller1888:openRecipe'
 INGREDIENTS 				= 'hermes/intent/Psychokiller1888:ingredients'
 PREVIOUS_STEP 				= 'hermes/intent/Psychokiller1888:previousStep'
 REPEAT_STEP 				= 'hermes/intent/Psychokiller1888:repeatStep'
@@ -40,12 +40,13 @@ ACTIVATE_TIMER 				= 'hermes/intent/Psychokiller1888:activateTimer'
 
 NEXT_STEP 					= 'hermes/intent/Pierrot-app:nextStep'
 GET_FOOD	 				= 'hermes/intent/Pierrot-app:getFoodRequest'
-PRODUCT_AGE	 				= 'hermes/intent/Pierrot-app:getProductAge'
-EATING_DATE 				= 'hermes/intent/Pierrot-app:getFoodRequest'
+# PRODUCT_AGE	 				= 'hermes/intent/Pierrot-app:getProductAge'
+# EATING_DATE 					= 'hermes/intent/Pierrot-app:getFoodRequest'
 # GET_FOOD_COOK_NOW 			= 'hermes/intent/Pierrot-app:getFoodAndCookNow'
-GET_FOOD_KEEP 				= 'hermes/intent/Pierrot-app:getFoodAndKeep'
+# GET_FOOD_KEEP 				= 'hermes/intent/Pierrot-app:getFoodAndKeep'
 COOK_NOW_OR_KEEP			= 'hermes/intent/Pierrot-app:nowOrLater'
 VALIDATE_QUESTION			= 'hermes/intent/Pierrot-app:validateQuestion'
+INVALIDATE_QUESTION			= 'hermes/intent/Pierrot-app:invalidateQuestion'
 START_RECIPE				= 'hermes/intent/Pierrot-app:startRecipe'
 CANCEL						= 'hermes/intent/Pierrot-app:cancelSession'
 
@@ -58,16 +59,48 @@ HERMES_CAPTURED 			= 'hermes/asr/textCaptured'
 HERMES_HOTWORD_TOGGLE_ON 	= 'hermes/hotword/toggleOn'
 
 recipe_ingredients = [
-	'pommes',
 	'pomme',
+	'pommes',
 	'courgette',
 	'courgettes',
 	'oeufs',
 	'oeuf'
-]
+	]
+
+tips_list_from_paprika = {
+	'pommes': {
+		'un crumble aux pommes': './recipes/fr/pomme-crumble.json'
+	},
+	'pomme': {
+		'un crumble aux pommes': './recipes/fr/pomme-crumble.json'
+	},
+	'courgette': {
+		'des pates aux courgettes': './recipes/fr/courgettes-pates.json'
+	},
+	'courgettes': {
+		'des pates aux courgettes': './recipes/fr/courgettes-pates.json'
+	},
+	'orange': {
+		'de la confiture d\'orange au thym': './recipes/fr/orange-confiture.json',
+		'une glace à l\'orange': './recipes/fr/orange-glace.json'
+	},
+	'oranges': {
+		'de la confiture d\'orange au thym': './recipes/fr/orange-confiture.json',
+		'une glace à l\'orange': './recipes/fr/orange-glace.json'
+	}
+}
+
+tips_list_from_marin = {
+	'orange': {
+		'huile essentielle': './recipes/fr/orange-huile.json'
+	},
+	'oranges': {
+		'huile essentielle': './recipes/fr/orange-huile.json'
+	}
+}
 
 def onConnect(client, userData, flags, rc):
-	mqttClient.subscribe(OPEN_RECIPE)
+	# mqttClient.subscribe(OPEN_RECIPE)
 	mqttClient.subscribe(NEXT_STEP)
 	mqttClient.subscribe(INGREDIENTS)
 	mqttClient.subscribe(PREVIOUS_STEP)
@@ -75,12 +108,13 @@ def onConnect(client, userData, flags, rc):
 	mqttClient.subscribe(ACTIVATE_TIMER)
 
 	mqttClient.subscribe(GET_FOOD)
-	mqttClient.subscribe(PRODUCT_AGE)
-	mqttClient.subscribe(EATING_DATE)
+	# mqttClient.subscribe(PRODUCT_AGE)
+	# mqttClient.subscribe(EATING_DATE)
 	# mqttClient.subscribe(GET_FOOD_COOK_NOW)
-	mqttClient.subscribe(GET_FOOD_KEEP)
+	# mqttClient.subscribe(GET_FOOD_KEEP)
 	mqttClient.subscribe(COOK_NOW_OR_KEEP)
 	mqttClient.subscribe(VALIDATE_QUESTION)
+	mqttClient.subscribe(INVALIDATE_QUESTION)
 	mqttClient.subscribe(START_RECIPE)
 	mqttClient.subscribe(CANCEL)
 
@@ -128,37 +162,45 @@ def onMessage(client, userData, message):
 			pixels.off()
 		return
 
-	global recipe, currentStep, timers, confirm, sessionId, product
+	global recipe, currentStep, timers, confirm, sessionId, product, tipIndex
 
 	sessionId = payload['sessionId']
 
-	if intent == OPEN_RECIPE:
-		print("INTENT : OPEN_RECIPE")
-		if 'slots' not in payload:
-			error(sessionId)
-			return
+	##### TODO stabiliser avant réactivation
 
-		slotRecipeName = payload['slots'][0]['value']['value'].encode('utf-8')
+	# if intent == OPEN_RECIPE:
+	# 	print("INTENT : OPEN_RECIPE")
+	# 	if 'slots' not in payload:
+	# 		error(sessionId)
+	# 		return
 
-		if recipe is not None and currentStep > 0:
-			if confirm <= 0:
-				confirm = 1
-				endTalk(sessionId, text=lang['warningRecipeAlreadyOpen'])
-				return
-			else:
-				for timer in timers:
-					timer.cancel()
+	# 	slotRecipeName = payload['slots'][0]['value']['value'].encode('utf-8')
 
-				timers = {}
-				confirm = 0
-				currentStep = 0
+	# 	if recipe is not None and currentStep > 0:
+	# 		if confirm <= 0:
+	# 			confirm = 1
+	# 			endTalk(sessionId, text=lang['warningRecipeAlreadyOpen'])
+	# 			return
+	# 		else:
+	# 			for timer in timers:
+	# 				timer.cancel()
 
-		# TODO changer cette condition par la prise en compte de l'ingredient dans le nom de la recette.
-		if any(slotRecipeName.lower() in ingredients for ingredients in recipe_ingredients):
-		# if os.path.isfile('./recipes/{}/{}.json'.format(settings.LANG, slotRecipeName.lower())):
-			readRecipe(sessionId, slotRecipeName, payload)
-		else:
-			endTalk(sessionId, text=lang['recipeNotFound'])
+	# 			timers = {}
+	# 			confirm = 0
+	# 			currentStep = 0
+
+	# 	if any(product.lower() in ingredients for ingredients in tips_list_from_paprika):
+	# 		recipe_nb = len(tips_list_from_paprika[product.lower()])
+	# 		if recipe_nb == 1:
+	# 			for recipe in tips_list_from_paprika[product.lower()]:
+	# 				continueSession(sessionId, "j'ai trouvé une astuce: "+ recipe +". Tu veux faire ça ?", intents=['Pierrot-app:validateQuestion'] )
+	# 		elif recipe_nb == 2:
+	# 			if getAssistantName() == "paprika":
+	# 				askForRecipe(tips_list_from_paprika)
+	# 			if getAssistantName() == "marin":
+	# 				askForRecipe(tips_list_from_marin)
+	# 	else:
+	# 		endTalk(sessionId, text=lang['noTipsForProduct'])
 
 	elif intent == NEXT_STEP:
 		print("INTENT : NEXT_STEP")
@@ -249,11 +291,16 @@ def onMessage(client, userData, message):
 
 	elif intent == GET_FOOD:
 		print("INTENT : GET_FOOD")
+		say = False
 		product = payload["slots"][0]["rawValue"]
-		if any(product.lower() in ingredients for ingredients in recipe_ingredients):
-			continueSession(sessionId=sessionId, text=lang['cookNowOrKeep'].format(product), intents=['Pierrot-app:nowOrLater'])
+		# If product asked exist in my list 
+		if any(product.lower() in ingredients for ingredients in tips_list_from_paprika):
+			if say is False:
+				print("say is False")
+				say = True
+				continueSession(sessionId=sessionId, text=lang['cookNowOrKeep'].format(product), intents=['Pierrot-app:nowOrLater'])
 		else:
-			endTalk(sessionId, text=lang['recipeNotFound'])
+			endTalk(sessionId, text=lang['noTipsForProduct'])
 
 	# elif intent == GET_FOOD_COOK_NOW:
 	# 	product = payload['slots'][0]['value']['value'].encode('utf-8')
@@ -265,7 +312,18 @@ def onMessage(client, userData, message):
 
 	elif intent == COOK_NOW_OR_KEEP:
 		print("INTENT : COOK_NOW_OR_KEEP")
-		readRecipe(sessionId, product, payload)
+		# Check we know a tip for current product
+		if any(product.lower() in ingredients for ingredients in getTipList()):
+			tip_nb = len(getTipList()[product.lower()])
+			if tip_nb == 1:
+				for tip in getTipList()[product.lower()]:
+					tipPath = getTipList()[product.lower()][tip]
+					getRecipe(sessionId, tipPath)
+					continueSession(sessionId, "j'ai trouvé une astuce: "+ tip +". Tu veux faire ça ?", intents=['Pierrot-app:validateQuestion', 'Pierrot-app:invalidateQuestion'] )
+			elif tip_nb == 2:
+				askForTwoTips(getTipList()[product.lower()])
+
+		# readRecipe(sessionId, product, payload)
 
 	elif intent == VALIDATE_QUESTION:
 		print("INTENT : VALIDATE_QUESTION")
@@ -288,6 +346,18 @@ def onMessage(client, userData, message):
 					ingredients += u"{}. ".format(ingredient)
 
 				endTalk(sessionId, text=lang['neededIngredients'].format(ingredients))
+
+	elif intent == INVALIDATE_QUESTION:
+		print("INTENT : INVALIDATE_QUESTION")
+		print("tupIndex : ", tipIndex)
+		if recipe is None:
+			endTalk(sessionId, text=lang['sorryNoRecipeOpen'])
+		else:
+			if tipIndex == 1:
+				tipIndex += 1
+				askForTwoTips(getTipList()[product.lower()])
+			else:
+				endTalk(sessionId, text=lang['noMoreTip'])
 
 	elif intent == START_RECIPE:
 		print("INTENT : START_RECIPE")
@@ -315,8 +385,24 @@ def onMessage(client, userData, message):
 		mqttClient.disconnect()
 		running = False
 
+def askForTwoTips(tipsList):
+	for i, tip in enumerate(tipsList, start=1):
+		tipPath = tipsList[tip]
+		if i == 1 and tipIndex == 1:
+			getRecipe(sessionId, tipPath)
+			continueSession(sessionId, "j'ai trouvé deux astuces: la première "+ tip +". Tu veux faire ça ?", intents=['Pierrot-app:validateQuestion', 'Pierrot-app:invalidateQuestion'])
+			# tipIndex += 1
+		if i == 2 and tipIndex == 2:
+			getRecipe(sessionId, tipPath)
+			continueSession(sessionId, "et la deuxième "+ tip +". Tu veux faire ça ?", intents=['Pierrot-app:validateQuestion', 'Pierrot-app:invalidateQuestion'])
+			# tipIndex +=1
 
-
+def getTipList():
+	hotword = utils.read_file("hotword.txt")
+	if hotword == "paprika":
+		return tips_list_from_paprika
+	elif hotword == "marin":
+		return tips_list_from_marin
 
 def error(sessionId):
 	endTalk(sessionId, lang['error'])
@@ -362,10 +448,10 @@ def onTimeUp(*args, **kwargs):
 	del timers[wasStep]
 	say(text=lang['timerEnd'].format(step['textAfterTimer']))
 
-def readRecipe(sessionId, slotRecipeName, payload):
+def getRecipe(sessionId, tipPath):
 	global recipe
 	currentStep = 0
-	file = codecs.open('./recipes/{}/{}.json'.format(settings.LANG, slotRecipeName.lower()), 'r', encoding='utf-8')
+	file = codecs.open(tipPath, 'r', encoding='utf-8')
 	string = file.read()
 	file.close()
 	recipe = json.loads(string)
@@ -376,7 +462,7 @@ def readRecipe(sessionId, slotRecipeName, payload):
 	timeType = lang['cookingTime'] if 'cookingTime' in recipe else lang['waitTime']
 	cookOrWaitTime = recipe['cookingTime'] if 'cookingTime' in recipe else recipe['waitTime']
 
-	continueSession(sessionId=sessionId, text=lang['recipeProposition'].format(recipeName), intents=['Pierrot-app:validateQuestion'])
+	# continueSession(sessionId=sessionId, text=lang['recipeProposition'].format(recipeName), intents=['Pierrot-app:validateQuestion'])
 
 
 mqttClient = None
@@ -384,7 +470,10 @@ leds = None
 running = True
 recipe = None
 sessionId = None
+startTip = False
+isChoosingTip = True
 currentStep = 0
+tipIndex = 1
 timers = {}
 confirm = 0
 lang = ''

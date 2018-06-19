@@ -23,7 +23,9 @@
 	"timerConfirm": "Ok! Minuteur pour cette étape démarré!",
 	"error": "Désolé, mais il y a eu une erreur",
 	"timerEnd": "Un minuteur est arrivé à terme: {}",
-	"cookNowOrKeep": "Tu veux manger tout de suite ou faire une conserve de {}?",
+	"cookNowOrKeep": "Tu veux le manger maintenant ou tu veux le garder pour plu tard ?",
 	"startRecipe": "Merci ! Laisse moi quelques secondes pour trouver une recette avec {}",
-	"recipeProposition" : "J’ai une recette qui va te plaire ! C'est {}, ça te tente ?"
+	"recipeProposition" : "J’ai une recette qui va te plaire ! C'est {}, ça te tente ?",
+	"noTipsForProduct" : "Désolé mais je n'ai pas d'astuce pour ce produit.",
+	"noMoreTip" : "Désolé je n'ai pas d'autre astuce pour ce produit, mais peut-être que Marin pourra t'aider"
 }
