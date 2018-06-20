@@ -5,11 +5,13 @@
 * Un micro Respeaker 2 mic HAT
 
 ## Préparation du raspberry et installation de Snips
-* Snips a réalisé [un tutoriel très complet](https://github.com/snipsco/snips-platform-documentation/wiki/1.-Setup-the-Snips-Voice-Platform) pour cette étape.
+* Snips a réalisé [un tutoriel très complet](https://snips.gitbook.io/documentation/installing-snips) pour cette étape.
 * Ne pas oublier d'activer le spi :
 	* `sudo raspi-config`
 	* Aller dans le menu `Interfacing options` et `Enable SPI`
 	* rebooter le raspberry
+  * configuration du asound.conf :
+    * `arecord -l` et `aplay -l` pour trouver les valeurs de la carte son à ajouter dans le fichier
 
 ## Installation de l'assistant ALLO sur le raspberry
 * Se connecter au raspberry `ssh pi@monipderaspberry`
