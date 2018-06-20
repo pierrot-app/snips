@@ -30,7 +30,7 @@ logging.basicConfig(
 
 # psycho intents
 
-# OPEN_RECIPE 				= 'hermes/intent/Psychokiller1888:openRecipe'
+OPEN_RECIPE 				= 'hermes/intent/Psychokiller1888:openRecipe'
 INGREDIENTS 				= 'hermes/intent/Psychokiller1888:ingredients'
 PREVIOUS_STEP 				= 'hermes/intent/Psychokiller1888:previousStep'
 REPEAT_STEP 				= 'hermes/intent/Psychokiller1888:repeatStep'
@@ -92,15 +92,15 @@ tips_list_from_paprika = {
 
 tips_list_from_marin = {
 	'orange': {
-		'huile essentielle': './recipes/fr/orange-huile.json'
+		'une huile essentielle d\'orange': './recipes/fr/orange-huile.json'
 	},
 	'oranges': {
-		'huile essentielle': './recipes/fr/orange-huile.json'
+		'une huile essentielle d\'orange': './recipes/fr/orange-huile.json'
 	}
 }
 
 def onConnect(client, userData, flags, rc):
-	# mqttClient.subscribe(OPEN_RECIPE)
+	mqttClient.subscribe(OPEN_RECIPE)
 	mqttClient.subscribe(NEXT_STEP)
 	mqttClient.subscribe(INGREDIENTS)
 	mqttClient.subscribe(PREVIOUS_STEP)
@@ -168,41 +168,40 @@ def onMessage(client, userData, message):
 
 	##### TODO stabiliser avant réactivation
 
-	# if intent == OPEN_RECIPE:
-	# 	print("INTENT : OPEN_RECIPE")
-	# 	if 'slots' not in payload:
-	# 		error(sessionId)
-	# 		return
+	if intent == OPEN_RECIPE:
+		print("INTENT : OPEN_RECIPE")
+		if 'slots' not in payload:
+			error(sessionId)
+			return
 
-	# 	slotRecipeName = payload['slots'][0]['value']['value'].encode('utf-8')
+		slotRecipeName = payload['slots'][0]['value']['value'].encode('utf-8')
 
-	# 	if recipe is not None and currentStep > 0:
-	# 		if confirm <= 0:
-	# 			confirm = 1
-	# 			endTalk(sessionId, text=lang['warningRecipeAlreadyOpen'])
-	# 			return
-	# 		else:
-	# 			for timer in timers:
-	# 				timer.cancel()
+		if recipe is not None and currentStep > 0:
+			if confirm <= 0:
+				confirm = 1
+				endTalk(sessionId, text=lang['warningRecipeAlreadyOpen'])
+				return
+			else:
+				for timer in timers:
+					timer.cancel()
 
-	# 			timers = {}
-	# 			confirm = 0
-	# 			currentStep = 0
+				timers = {}
+				confirm = 0
+				currentStep = 0
 
-	# 	if any(product.lower() in ingredients for ingredients in tips_list_from_paprika):
-	# 		recipe_nb = len(tips_list_from_paprika[product.lower()])
-	# 		if recipe_nb == 1:
-	# 			for recipe in tips_list_from_paprika[product.lower()]:
-	# 				continueSession(sessionId, "j'ai trouvé une astuce: "+ recipe +". Tu veux faire ça ?", intents=['Pierrot-app:validateQuestion'] )
-	# 		elif recipe_nb == 2:
-	# 			if getAssistantName() == "paprika":
-	# 				askForRecipe(tips_list_from_paprika)
-	# 			if getAssistantName() == "marin":
-	# 				askForRecipe(tips_list_from_marin)
-	# 	else:
-	# 		endTalk(sessionId, text=lang['noTipsForProduct'])
-
-	elif intent == NEXT_STEP:
+		if any(product.lower() in ingredients for ingredients in tips_list_from_paprika):
+			recipe_nb = len(tips_list_from_paprika[product.lower()])
+			if recipe_nb == 1:
+				for recipe in tips_list_from_paprika[product.lower()]:
+					continueSession(sessionId, "j'ai trouvé une astuce: "+ recipe +". Tu veux faire ça ?", intents=['Pierrot-app:validateQuestion'] )
+			elif recipe_nb == 2:
+				if getAssistantName() == "paprika":
+					askForRecipe(tips_list_from_paprika)
+				if getAssistantName() == "marin":
+					askForRecipe(tips_list_from_marin)
+		else:
+			endTalk(sessionId, text=lang['noTipsForProduct'])
+	if intent == NEXT_STEP:
 		print("INTENT : NEXT_STEP")
 		if recipe is None:
 			print("recipe is None NEXT_STEP")
@@ -312,6 +311,9 @@ def onMessage(client, userData, message):
 
 	elif intent == COOK_NOW_OR_KEEP:
 		print("INTENT : COOK_NOW_OR_KEEP")
+		# if recipe is None:
+		# 	endTalk(sessionId, text=lang['sorryNoRecipeOpen'])
+		# else:
 		# Check we know a tip for current product
 		if any(product.lower() in ingredients for ingredients in getTipList()):
 			tip_nb = len(getTipList()[product.lower()])
