@@ -296,13 +296,14 @@ def onMessage(client, userData, message):
 
 	elif intent == GET_FOOD:
 		print("INTENT : GET_FOOD")
+		sayNoSession(lang['searching'])
 		asTalk = False
 		product = payload["slots"][0]["rawValue"]
 		# If product asked exist in my list 
 		if any(product.lower() in ingredients for ingredients in getTipList()):
 			if asTalk is False:
 				asTalk = True
-				if lastIntent == "ASK_FOR_TIP":
+				if lastIntent == "ASK_FOR_TIP" or getAssistant() == "marin":
 					readTipsProposition()
 				else:
 					continueSession(sessionId=sessionId, text=lang['cookNowOrKeep'].format(product), intents=['Pierrot-app:nowOrLater'])
@@ -340,7 +341,8 @@ def onMessage(client, userData, message):
 		print("INTENT : VALIDATE_QUESTION")
 		if recipe is None:
 			endTalk(sessionId, text=lang['sorryNoRecipeOpen'])
-		elif fromIntent == "COOK_NOW_OR_KEEP":
+		# elif fromIntent == "COOK_NOW_OR_KEEP":
+		else:
 			if currentStep != 0:
 				currentStep += 1
 				step = recipe['steps'][str(currentStep)]
@@ -357,8 +359,8 @@ def onMessage(client, userData, message):
 					ingredients += u"{}. ".format(ingredient)
 
 				endTalk(sessionId, text=lang['neededIngredients'].format(ingredients))
-		elif fromIntent == "ASK_FOR_TIP":
-			print("fromIntent == ASK_FOR_TIP")
+		# elif fromIntent == "ASK_FOR_TIP" or fromIntent == "GET_FOOD":
+		# 	readTipsProposition()
 		fromIntent = "VALIDATE_QUESTION"
 
 	elif intent == INVALIDATE_QUESTION:
@@ -402,8 +404,6 @@ def onMessage(client, userData, message):
 		running = False
 
 def readTipsProposition():
-	# say(lang['searching'])
-	# time.sleep(2)
 	if any(product.lower() in ingredients for ingredients in getTipList()):
 		tip_nb = len(getTipList()[product.lower()])
 		if tip_nb == 1:
@@ -435,6 +435,10 @@ def getTipList():
 	elif hotword == "marin":
 		return tips_list_from_marin
 
+def getAssistant():
+	assistantName = utils.read_file("hotword.txt")
+	return assistantName
+
 def error(sessionId):
 	endTalk(sessionId, lang['error'])
 
@@ -457,6 +461,13 @@ def say(text):
 			'type': 'notification',
 			'text': text
 		}
+	}))
+
+def sayNoSession(text):
+	mqttClient.publish('hermes/tts/say', json.dumps({
+		'text' : text,
+		'lang' : 'fr',
+		'siteId' : 'default'
 	}))
 
 def nextStep(sessionId):

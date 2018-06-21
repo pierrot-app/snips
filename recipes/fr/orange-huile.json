@@ -1,33 +1,24 @@
 {
-	"categories": [
-		"Pates",
-		"Courgette"
-	],
-	"name": "une recette de pâtes aux courgettes",
-	"person": 2,
-	"difficulty": "facile",
-	"preparationTime": "10 minutes",
-	"cookingTime": "20 minutes",
-	"totalTime": "30 minutes",
-	"ingredients": [
-		"1 courgette",
-		"épices : ail en poudre, paprika et poivre",
-		"une cuillère à soupe d’huile d’olive",
-		"des pates",
-		"une cuillère à soupe de crème fraîche",
-		"du parmesan"
-	],
-	"steps": {
-		"1": "Mettre une casserole d’eau à bouillir.",
-		"2": "Laver, éplucher et couper en rondelles la courgette.",
-		"3": "La disposer dans un plat allant au four, ajouter l’huile d’olive, les épices selon votre goût.",
-		"4": {
-			"text": "Bien mélanger et enfourner une dizaine de minutes à 180 degrés",
-			"timer": 600,
-			"textAfterTimer": "Il est temps de sortir les courgettes du four!"
-		},
-		"5": "Pendant ce temps, faire cuire les pâtes. Se référer au temps indiqué sur le paquet.",
-		"6": "Une fois cuite, mélanger les courgettes avec la crème fraîche.",
-		"7": "Dresser les pâtes, verser les courgettes et la crème fraîche par dessus servir sans plus attendre avec un peu de parmesan."
-	}
+    "categories": [
+        "Orange",
+        "Nettoyant",
+        "Salle de bain"
+    ],
+    "name": "une recette de nettoyant à l'orange",
+    "person": 1,
+    "difficulty": "facile",
+    "preparationTime": "5 minutes",
+    "cookingTime": "1 semaine",
+    "totalTime": "1 semaine",
+    "ingredients": [
+        "des oranges",
+        "du vinaigre blanc ou du vinaigre d'alcool",
+        "un pot ou un pulverisateur"
+    ],
+    "steps": {
+        "1": "Peler les oranges. Retirer le plus de blanc possible.",
+        "2": "Mettre les pelures d'orange dans le pot. Recouvrir de vodka.",
+        "3": "Fermer le pot et agiter energiquement quelques secondes.",
+        "4": "Bravo ! Vous n'avez plus qu'à laisser reposer une semaine et votre nettoyant sera prêt."
+    }
 }
