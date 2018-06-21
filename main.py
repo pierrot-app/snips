@@ -40,6 +40,7 @@ ACTIVATE_TIMER 				= 'hermes/intent/Psychokiller1888:activateTimer'
 
 NEXT_STEP 					= 'hermes/intent/Pierrot-app:nextStep'
 GET_FOOD	 				= 'hermes/intent/Pierrot-app:getFoodRequest'
+ASK_FOR_TIP	 				= 'hermes/intent/Pierrot-app:askForTip'
 # PRODUCT_AGE	 				= 'hermes/intent/Pierrot-app:getProductAge'
 # EATING_DATE 					= 'hermes/intent/Pierrot-app:getFoodRequest'
 # GET_FOOD_COOK_NOW 			= 'hermes/intent/Pierrot-app:getFoodAndCookNow'
@@ -108,6 +109,7 @@ def onConnect(client, userData, flags, rc):
 	mqttClient.subscribe(ACTIVATE_TIMER)
 
 	mqttClient.subscribe(GET_FOOD)
+	mqttClient.subscribe(ASK_FOR_TIP)
 	# mqttClient.subscribe(PRODUCT_AGE)
 	# mqttClient.subscribe(EATING_DATE)
 	# mqttClient.subscribe(GET_FOOD_COOK_NOW)
@@ -162,7 +164,7 @@ def onMessage(client, userData, message):
 			pixels.off()
 		return
 
-	global recipe, currentStep, timers, confirm, sessionId, product, tipIndex
+	global recipe, currentStep, timers, confirm, sessionId, product, tipIndex, fromIntent
 
 	sessionId = payload['sessionId']
 
@@ -195,12 +197,11 @@ def onMessage(client, userData, message):
 				for recipe in tips_list_from_paprika[product.lower()]:
 					continueSession(sessionId, "j'ai trouvé une astuce: "+ recipe +". Tu veux faire ça ?", intents=['Pierrot-app:validateQuestion'] )
 			elif recipe_nb == 2:
-				if getAssistantName() == "paprika":
-					askForRecipe(tips_list_from_paprika)
-				if getAssistantName() == "marin":
-					askForRecipe(tips_list_from_marin)
+				askForTwoTips(getTipList)
 		else:
 			endTalk(sessionId, text=lang['noTipsForProduct'])
+		fromIntent = "OPEN_RECIPE"
+
 	if intent == NEXT_STEP:
 		print("INTENT : NEXT_STEP")
 		if recipe is None:
@@ -222,6 +223,7 @@ def onMessage(client, userData, message):
 				endTalk(sessionId, text=lang['nextStep'].format(step))
 				if ask:
 					say(text=lang['timerAsk'])
+		fromIntent = "NEXT_STEP"
 
 	elif intent == INGREDIENTS:
 		print("INTENT : INGREDIENTS")
@@ -233,6 +235,7 @@ def onMessage(client, userData, message):
 				ingredients += u"{}. ".format(ingredient)
 
 			endTalk(sessionId, text=lang['neededIngredients'].format(ingredients))
+		fromIntent = "INGREDIENTS"
 
 	elif intent == PREVIOUS_STEP:
 		print("INTENT : PREVIOUS_STEP")
@@ -255,6 +258,7 @@ def onMessage(client, userData, message):
 				endTalk(sessionId, text=lang['previousStepWas'].format(step))
 				if ask:
 					say(text=lang['hadTimerAsk'].format(timer))
+		fromIntent = "PREVIOUS_STEP"
 
 	elif intent == REPEAT_STEP:
 		print("INTENT : REPEAT_STEP")
@@ -270,6 +274,7 @@ def onMessage(client, userData, message):
 			else:
 				step = recipe['steps'][str(currentStep)]
 				endTalk(sessionId, text=lang['repeatStep'].format(step))
+		fromIntent = "REPEAT_STEP"
 
 	elif intent == ACTIVATE_TIMER:
 		print("INTENT : ACTIVATE_TIMER")
@@ -287,19 +292,32 @@ def onMessage(client, userData, message):
 				timer.start()
 				timers[currentStep] = timer
 				endTalk(sessionId, text=lang['timerConfirm'])
+		fromIntent = "ACTIVATE_TIMER"
 
 	elif intent == GET_FOOD:
 		print("INTENT : GET_FOOD")
-		say = False
+		asTalk = False
 		product = payload["slots"][0]["rawValue"]
 		# If product asked exist in my list 
-		if any(product.lower() in ingredients for ingredients in tips_list_from_paprika):
-			if say is False:
-				print("say is False")
-				say = True
-				continueSession(sessionId=sessionId, text=lang['cookNowOrKeep'].format(product), intents=['Pierrot-app:nowOrLater'])
+		if any(product.lower() in ingredients for ingredients in getTipList()):
+			if asTalk is False:
+				asTalk = True
+				if lastIntent == "ASK_FOR_TIP":
+					readTipsProposition()
+				else:
+					continueSession(sessionId=sessionId, text=lang['cookNowOrKeep'].format(product), intents=['Pierrot-app:nowOrLater'])
 		else:
 			endTalk(sessionId, text=lang['noTipsForProduct'])
+		fromIntent = "GET_FOOD"
+
+	elif intent == ASK_FOR_TIP:
+		print("INTENT : ASK_FOR_TIP")
+		if product in getTipList():
+			continueSession(sessionId=sessionId, text=lang['tipFor'].format(product), intents=['Pierrot-app:validateQuestion', 'Pierrot-app:invalidateQuestion'])
+		else:
+			continueSession(sessionId=sessionId, text=lang['tipForWhat'], intents=['Pierrot-app:getFoodRequest'])
+		fromIntent = "ASK_FOR_TIP"
+
 
 	# elif intent == GET_FOOD_COOK_NOW:
 	# 	product = payload['slots'][0]['value']['value'].encode('utf-8')
@@ -314,24 +332,15 @@ def onMessage(client, userData, message):
 		# if recipe is None:
 		# 	endTalk(sessionId, text=lang['sorryNoRecipeOpen'])
 		# else:
-		# Check we know a tip for current product
-		if any(product.lower() in ingredients for ingredients in getTipList()):
-			tip_nb = len(getTipList()[product.lower()])
-			if tip_nb == 1:
-				for tip in getTipList()[product.lower()]:
-					tipPath = getTipList()[product.lower()][tip]
-					getRecipe(sessionId, tipPath)
-					continueSession(sessionId, "j'ai trouvé une astuce: "+ tip +". Tu veux faire ça ?", intents=['Pierrot-app:validateQuestion', 'Pierrot-app:invalidateQuestion'] )
-			elif tip_nb == 2:
-				askForTwoTips(getTipList()[product.lower()])
+		readTipsProposition()
+		fromIntent = "COOK_NOW_OR_KEEP"
 
-		# readRecipe(sessionId, product, payload)
 
 	elif intent == VALIDATE_QUESTION:
 		print("INTENT : VALIDATE_QUESTION")
 		if recipe is None:
 			endTalk(sessionId, text=lang['sorryNoRecipeOpen'])
-		else:
+		elif fromIntent == "COOK_NOW_OR_KEEP":
 			if currentStep != 0:
 				currentStep += 1
 				step = recipe['steps'][str(currentStep)]
@@ -348,6 +357,9 @@ def onMessage(client, userData, message):
 					ingredients += u"{}. ".format(ingredient)
 
 				endTalk(sessionId, text=lang['neededIngredients'].format(ingredients))
+		elif fromIntent == "ASK_FOR_TIP":
+			print("fromIntent == ASK_FOR_TIP")
+		fromIntent = "VALIDATE_QUESTION"
 
 	elif intent == INVALIDATE_QUESTION:
 		print("INTENT : INVALIDATE_QUESTION")
@@ -360,6 +372,7 @@ def onMessage(client, userData, message):
 				askForTwoTips(getTipList()[product.lower()])
 			else:
 				endTalk(sessionId, text=lang['noMoreTip'])
+		fromIntent = "INVALIDATE_QUESTION"
 
 	elif intent == START_RECIPE:
 		print("INTENT : START_RECIPE")
@@ -377,6 +390,7 @@ def onMessage(client, userData, message):
 			endTalk(sessionId, text=lang['nextStep'].format(step))
 			if ask:
 				say(text=lang['timerAsk'])
+		fromIntent = "START_RECIPE"
 
 
 	elif intent == CANCEL:
@@ -386,6 +400,21 @@ def onMessage(client, userData, message):
 		mqttClient.loop_stop()
 		mqttClient.disconnect()
 		running = False
+
+def readTipsProposition():
+	# say(lang['searching'])
+	# time.sleep(2)
+	if any(product.lower() in ingredients for ingredients in getTipList()):
+		tip_nb = len(getTipList()[product.lower()])
+		if tip_nb == 1:
+			for tip in getTipList()[product.lower()]:
+				tipPath = getTipList()[product.lower()][tip]
+				getRecipe(sessionId, tipPath)
+				continueSession(sessionId, "j'ai trouvé une astuce: "+ tip +". Tu veux faire ça ?", intents=['Pierrot-app:validateQuestion', 'Pierrot-app:invalidateQuestion'] )
+		elif tip_nb == 2:
+			askForTwoTips(getTipList()[product.lower()])
+	else:
+		endTalk(sessionId, text=lang['noTipsForProduct'])
 
 def askForTwoTips(tipsList):
 	for i, tip in enumerate(tipsList, start=1):
@@ -468,12 +497,13 @@ def getRecipe(sessionId, tipPath):
 
 
 mqttClient = None
+product = None
 leds = None
 running = True
 recipe = None
 sessionId = None
 startTip = False
-isChoosingTip = True
+lastIntent = ""
 currentStep = 0
 tipIndex = 1
 timers = {}
