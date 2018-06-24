@@ -1,0 +1,31 @@
+{
+    "categories": [
+        "Orange",
+        "Agrume",
+        "Citron",
+        "Lave-vaisselle",
+        "Tablette",
+        "Nettoyant",
+        "Salle de bain"
+    ],
+    "name": "une préparation de tablette pour lave vaisselle à l'orange",
+    "person": 1,
+    "difficulty": "facile",
+    "preparationTime": "5 minutes",
+    "cookingTime": "1 journée",
+    "totalTime": "1 journée",
+    "ingredients": [
+        "2 oranges",
+        "250 grammes de bicarbonate alimentaire",
+        "250 grammes de sel fin",
+        "un bac à glaçons"
+    ],
+    "steps": {
+        "1": "Peler les oranges et couper la peau en petits morceaux",
+        "2": "Écraser les oranges et conserver le jus",
+        "3": "Mélanger 250 grammes de bicarbonate et 250 grammes de sel",
+        "4": "Ajouter la peau d'orange et le jus d'orange. Mélanger le tout",
+        "5": "Verser le mélange dans le bac à glaçon.",
+        "6": "Laissez sécher une nuit et le tour est joué. Vous pourrez remplacer vos tablettes lave-vaisselle avec cette préparation."
+    }
+}

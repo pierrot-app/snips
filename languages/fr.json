@@ -1,5 +1,5 @@
 {
-	"appReady": "Assistant de cuisine fonctionnel, chef!",
+	"appReady": "Assistant Allo fonctionnel !",
 	"stopping": "Arrêt du programme",
 	"warningRecipeAlreadyOpen": "Nous avons déjà commencé une recette! Si j'en ouvre une autre, on ne pourra plus continuer sur celle-ci et tous les minuteurs seront annulés! Confirme ton intention en me demandant à nouveau d'ouvrir la recette!",
 	"confirmOpening": "Ok, j'ouvre la recette {}, un instant",
@@ -9,9 +9,10 @@
 	"recipeNotFound": "Je suis désolé mais je ne trouve pas cette recette",
 	"sorryNoRecipeOpen": "Pardon, mais tu ne m'as pas demandé d'ouvrir une recette!",
 	"recipeEnd": "Nous sommes arrivé à la fin de la recette, il n'y a pas d'étape supplémentaire, si ce n'est déguster la préparation! Bon appetit!",
+	"firstStep": "La première étape: {}, dis moi suivant lorsque tu as terminé. Je peux aussi répéter",
 	"nextStep": "Voici la prochaine étape: {}",
 	"timerAsk": "Cette étape comporte un minuteur. Tu peux me demander de minuter dès que tu seras prêt",
-	"neededIngredients": "Pour cette recette il te faudra : {}, dis moi quand tu es prêt.",
+	"neededIngredients": "Voici ce dont tu auras besoin : {}, dis moi quand tu es prêt.",
 	"noPreviousStep": "Il n'y a pas d'étape précédante",
 	"previousStepWas": "L'étape précédente était: {}",
 	"hadTimerAsk": "Cette étape comportait un minuteur de {} secondes. Tu peux me demander de minuter si tu es prêt",
@@ -27,8 +28,8 @@
 	"startRecipe": "Merci ! Laisse moi quelques secondes pour trouver une recette avec {}",
 	"recipeProposition" : "J’ai une recette qui va te plaire ! C'est {}, ça te tente ?",
 	"noTipsForProduct" : "je n'ai pas d'astuces pour ce produit.",
-	"noMoreTip" : " j'ai bien cherché mais je n'ai pas trouvé d'autres astuce pour ce produit. Appelle marin, il pourra certainement t'aider.",
+	"noMoreTip" : " j'ai bien cherché mais je n'ai pas trouvé d'autres astuce pour ce produit. Appelle {}, {} pourra certainement t'aider.",
 	"tipForWhat": "Tu cherches une astuce pour quel produit ?",
 	"tipFor": "Tu cherches des astuces pour {} ?",
-	"searching": "D'accord, je cherche ce qu'on peut faire."
+	"searching": "Je cherche ce qu'on peut faire."
 }
